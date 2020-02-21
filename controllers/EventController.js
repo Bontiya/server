@@ -23,7 +23,7 @@ class EventController {
   }
   static async getEventDetail(req, res, next) {
     try {
-      const { eventid } = req.query;
+      const { eventid } = req.params;
       const detail = Event.findOne(
         { _id: eventid }).populate('admin') // populate admin dan members juga
       res.status(200).json(detail);
