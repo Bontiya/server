@@ -1,9 +1,11 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
+const UserController = require('../controllers/UserController');
+const authentication = require('../middlewares/authentication');
+const preUserUpdatePassword = require('../middlewares/preUserUpdatePassword');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.put('/', authentication, UserController.update);
+router.patch('/password', [authentication, preUserUpdatePassword], UserController.updatePassword);
+router.get('/search', authentication, UserController.getUserBySearch);
+router.get('/:id', authentication, UserController.get);
 
 module.exports = router;
