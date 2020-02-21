@@ -22,8 +22,11 @@ module.exports = function (err, req, res, next) {
         }
         status = 409
         msg = errors
+    }else if (err.name === 'Forbidden') {
+        status = 404
+        msg = [err.errors[0].message]
     }
-    console.log(msg)
+    // console.log(msg)
     res.status(status).json({
         errors: msg
     })

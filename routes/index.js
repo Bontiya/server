@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const auth = require('./auth');
-const errorHandler = require('../middlewares/ErrorHandler');
+const users = require('./users')
+const errorHandler = require('../middlewares/errorHandler');
 
 // ini biarin yaa
 router.get('/', function(req, res, next) {
@@ -10,6 +11,8 @@ router.get('/', function(req, res, next) {
 });
 
 router.use('/auth', auth)
+router.use('/users', users)
+
 router.use(errorHandler)
 
 module.exports = router;
