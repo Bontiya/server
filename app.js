@@ -5,7 +5,11 @@ if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
 const express = require('express');
 const mongoose = require('mongoose');
 
-const uriDB = `mongodb+srv://${process.env.MONGO_NAME}:${process.env.MONGO_PASSWORD}@cluster0-x8shq.gcp.mongodb.net/bontiya_${process.env.NODE_ENV}?retryWrites=true&w=majority`;
+// db server
+// const uriDB = `mongodb+srv://${process.env.MONGO_NAME}:${process.env.MONGO_PASSWORD}@cluster0-x8shq.gcp.mongodb.net/bontiya_${process.env.NODE_ENV}?retryWrites=true&w=majority`;
+// db local
+const uriDB = `mongodb://localhost/bontiya_${process.env.NODE_ENV}`
+
 const configDB = {useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }
 mongoose.connect(uriDB, configDB)
 
