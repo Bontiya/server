@@ -12,7 +12,7 @@ const dummyUser = {
     password: "dzakki",
     gender: "male"
 }
-
+global.dummyUser = dummyUser
 describe('AUTH SUCCESS', function () {
     describe('POST /auth/register', function () {  
         it('should send object with status code 200', function (done) {  
@@ -54,6 +54,7 @@ describe('AUTH SUCCESS', function () {
                         name: dummyUser.name,
                         email: dummyUser.email,
                     })
+                    global.userId = res.body._id
                     global.token = res.body.token
                     done()
                 })

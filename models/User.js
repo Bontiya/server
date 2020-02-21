@@ -31,7 +31,7 @@ const userSchema = new Schema({
     },
     provider: {
         type: String,
-        enum: ['fefault', 'google'],
+        enum: ['default', 'google'],
     }
 },{
     timestamps: { 
