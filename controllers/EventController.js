@@ -33,7 +33,7 @@ class EventController {
   }
   static async handleEventStatus(req, res, next) {
     try {
-      const { eventid } = req.query;
+      const { eventid } = req.params;
       const { status } = req.body;
       if (status === 'scheduled' || status === 'ongoing' || status === 'done') {
         const updated = await Event.findByIdAndUpdate(
