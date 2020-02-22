@@ -14,9 +14,27 @@ class LocationContrller {
         method: 'GET',
         url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lat},${lon}&key=${process.env.GOOGLE_MAP_KEY}`
       })
-      // ?
-      const response = { address: data.results[2].formatted_address };
-      res.status(200).json(response);
+      const placesId = [];
+      for (let i = 0; i < data.results.length; i++) {
+        placesId.push(data.results[i].place_id);
+      }
+      const placesName = [];
+      const promises = []
+      placesId.forEach((id) => {
+        promises.push(axios({
+          method: 'GET',
+          url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${id}&fields=name`
+        }))
+      })
+      Promise
+        .all(promises)
+        .then((results) => {
+          results.forEach(result => {
+            placesName.push(result.data.result.name)
+          })
+          res.status(200).json(placesName);
+        })
+        .catch(next)
     } catch (err) {
       next(err);
     }
@@ -30,7 +48,9 @@ class LocationContrller {
         from: 0,
         query: {
           match: {
-            name: q,
+            name: {
+              query: q
+            },
           },
         },
       };
@@ -39,23 +59,24 @@ class LocationContrller {
           body: body,
           type: 'location-list' 
         })
+      const place_prediction = [];
+      const { data }  = await axios({
+        method: 'GET',
+        url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&radius=500&limit=10&location=${lat},${lon}`
+      });
+      for (let i = 0; i < data.predictions.length; i++) {
+        const detail = {
+          id: data.predictions[i].place_id,
+          name: data.predictions[i].structured_formatting.main_text,
+          description: data.predictions[i].description
+        };
+        place_prediction.push(detail);
+      }
       if (hits.hits.hits.length < 1) {
-        const place_prediction = [];
-        const { data }  = await axios({
-          method: 'GET',
-          url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&radius=500&limit=10&location=${lat},${lon}`
-        })
-        for (let i = 0; i < data.predictions.length; i++) {
-          const detail = {
-            id: data.predictions[i].place_id,
-            name: data.predictions[i].structured_formatting.main_text,
-            description: data.predictions[i].description
-          };
-          place_prediction.push(detail);
-        }
         res.status(200).json(place_prediction);
       } else {
-        res.status(200).json(hits.hits.hits[0]._source)
+        place_prediction.unshift(hits.hits.hits[0]._source)
+        res.status(200).json(place_prediction);
       }
     } catch (err) {
       next(err);
