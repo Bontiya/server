@@ -290,7 +290,7 @@
 #### update status event
 * PATCH /events/:eventId/status
 * header `authorization=token`
-* body `status=enum('onGoing', 'done')`, `locatio=Obj`
+* body `status=enum('onGoing', 'done')`
 * output
     ```
     {
@@ -321,11 +321,6 @@
             {
                 _id: '5e50e5a33d3a0357272fc1b4',
                 event: '5e50e5a33d3a0357272fc1b3',
-                location: {
-                    name: "Rumah ku",
-                    lat: 19.311143,
-                    lon: -1.406250
-                },
                 user: {
                     _id: '5e50e3ec2ec0ef551091c2e9',
                     name: 'Ahmad muzakki baru',
@@ -337,7 +332,7 @@
                 },
                 role: 'guest',
                 statusKey: false,
-                statusInvited: 'received',
+                statusInvited: 'pending',
                 __v: 0
             }
         ],
@@ -412,20 +407,55 @@
 
 * PATCH `/events/members/status-invited`
 * header `authorization=token`
-* body `statusInvited=enum('received', 'refused', 'canceled')`
+* body `statusInvited=enum('received', 'refused', 'canceled')`, `locatio=Obj`
 * output
     ```
         {
             location: { name: 'PIM', lat: 19.311143, lon: -1.40625 },
             members: [
                 {
-                _id: '5e50f98da31baa623e39e1c4',
-                event: '5e50f98da31baa623e39e1c3',
-                user: [Object],
-                role: 'host',
-                statusKey: false,
-                statusInvited: 'received',
-                __v: 0
+                    _id: '5e50e5a33d3a0357272fc1b4',
+                    event: '5e50e5a33d3a0357272fc1b3',
+                    location: {
+                        name: "Rumah ku",
+                        lat: 19.311143,
+                        lon: -1.406250
+                    },
+                    user: {
+                        _id: '5e50e3ec2ec0ef551091c2e9',
+                        name: 'Ahmad muzakki baru',
+                        email: 'dzakkiaz7@gmail.com',
+                        gender: 'male',
+                        created_at: '2020-02-22T08:18:52.965Z',
+                        updated_at: '2020-02-22T08:18:53.292Z',
+                        username: 'dzakki'
+                    },
+                    role: 'host',
+                    statusKey: false,
+                    statusInvited: 'received',
+                    __v: 0
+                },
+                {
+                    _id: '5e50e5a33d3a0357272fc1b4',
+                    event: '5e50e5a33d3a0357272fc1b3',
+                    location: {
+                        name: "Rumah ku",
+                        lat: 19.311143,
+                        lon: -1.406250
+                    },
+                    user: {
+                        _id: '5e50e3ec2ec0ef551091c2e9',
+                        name: 'Ahmad muzakki baru',
+                        email: 'dzakkiaz7@gmail.com',
+                        gender: 'male',
+                        created_at: '2020-02-22T08:18:52.965Z',
+                        updated_at: '2020-02-22T08:18:53.292Z',
+                        username: 'dzakki'
+                    },
+                    role: 'guest',
+                    statusKey: false,
+                    statusInvited: 'received',
+                    __v: 0
                 }
             ],
             _id: '5e50f98da31baa623e39e1c3',
