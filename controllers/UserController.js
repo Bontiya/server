@@ -80,10 +80,11 @@ class UserController {
         User
             .updateOne({ _id: req.userId }, { password },)
             .then((rs) => { 
-                return User.findOne({ _id: req.userId })
+                return User
+                        .findOne({ _id: req.userId })
+                        .select('-password -provider')
             })
             .then(user => {
-                delete user.password
                 res.status(200).json(user)
             })
             .catch(next)

@@ -33,7 +33,7 @@ const EventSchema = new Schema({
 
 EventSchema.pre('save', function(next) {
   const event = this;
-  event.status = 'scheduled';
+  event.status = 'onGoing';
   next();
 });
 

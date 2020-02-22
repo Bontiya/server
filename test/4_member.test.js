@@ -85,6 +85,7 @@ describe('MEMBER', function () {
                 })
                 .set('authorization', global.token)
                 .then(res => {
+                    // console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('statusInvited')
@@ -100,7 +101,7 @@ describe('MEMBER', function () {
             chai
                 .request(app)
                 .patch(`/events/${global.eventId}/status`)
-                .send({ status: 'ongoing' })
+                .send({ status: 'done' })
                 .set('authorization', global.token)
                 .then(res => {
                     expect(res).to.have.status(200)
@@ -111,7 +112,7 @@ describe('MEMBER', function () {
                     expect(res.body).to.have.property('members')
                     expect(res.body.members).to.be.an('array')
                     expect(res.body.members.length).to.equal(3)
-                    expect(res.body.status).to.equal('ongoing')
+                    expect(res.body.status).to.equal('done')
                     done()
                 })
                 .catch(console.log)
@@ -125,7 +126,7 @@ describe('MEMBER', function () {
                 .get(`/events/members/status-invited/pending`)
                 .set('authorization', global.token2)
                 .then(res => {
-                    console.log(res.body)
+                    // console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('array')
                     expect(res.body.length).to.equal(1)

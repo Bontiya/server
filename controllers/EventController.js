@@ -58,11 +58,15 @@ class EventController {
   }
 
   static async getEvents(req, res, next) {
+    let options = {
+      user: req.userId
+    }
+    if (req.query.status) {
+      options.status = req.query.status
+    }
     try {
       const members = await Member
-                            .find({
-                              user: req.userId
-                            })
+                            .find(options)
                             .populate({
                               path: 'event',
                               populate: {

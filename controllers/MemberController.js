@@ -89,6 +89,9 @@ class MemberController {
                 user: req.userId,
                 statusInvited: 'pending'
             })
+            .populate({
+                path: 'event',
+            })
             .then(member => {
                 res.status(200).json(member)
             })
