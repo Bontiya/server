@@ -5,7 +5,7 @@ const errorHandler = require('../middlewares/errorHandler');
 const auth = require('./auth');
 const users = require('./users')
 const location = require('./location');
-const event = require('./Event');
+const event = require('./event');
 
 // ini biarin yaa
 router.get('/', function(req, res, next) {
