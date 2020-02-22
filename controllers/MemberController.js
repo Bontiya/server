@@ -83,7 +83,7 @@ class MemberController {
 
 
     static getStatusInvitedPending(req, res, next) {
-        console.log(req.userId, '============')
+        // console.log(req.userId, '============')
         Member
             .find({
                 user: req.userId,
