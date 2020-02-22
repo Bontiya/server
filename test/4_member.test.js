@@ -56,7 +56,7 @@ describe('MEMBER', function () {
                 .send(members)
                 .set('authorization', global.token)
                 .then(res => {
-                    // console.log(res.body)
+                    console.log(res.body, '==========')
                     expect(res).to.have.status(201)
                     expect(res.body).to.be.an('object')
                     expect(res.body.members).to.be.an('array')
@@ -81,11 +81,16 @@ describe('MEMBER', function () {
                 .request(app)
                 .patch(`/events/members/${global.memberId}/status-invited`)
                 .send({
-                    statusInvited: 'received'
+                    statusInvited: 'received',
+                    location: {
+                        name: "Rumah ku",
+                        lat: 19.311143,
+                        lon: -1.406250
+                    },
                 })
                 .set('authorization', global.token)
                 .then(res => {
-                    // console.log(res.body)
+                    console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('statusInvited')

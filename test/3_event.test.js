@@ -17,6 +17,11 @@ const dummyEvent = {
     time : new Date().toDateString(),
     key: 'shoe',
     description: 'nothing',
+    locationHost: {
+        name: "PIM",
+        lat: 19.311143,
+        lon: -1.406250
+    },
 }
 
 describe('EVENT', function () {  

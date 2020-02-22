@@ -14,7 +14,7 @@ const _populateMember = {
 class EventController {
   static async createNewEvent(req, res, next) {
     try {
-      const { name, location, time, key } = req.body;
+      const { name, location, time, key, locationHost } = req.body;
       const description = req.body.description || 'Description not available';
       const eventDetail = {
         name,
@@ -22,7 +22,7 @@ class EventController {
         time,
         key,
         description,
-        status: 'scheduled'
+        status: 'scheduled',
       };
       const event = await Event.create(eventDetail);
       const member = await Member.create({
@@ -30,7 +30,8 @@ class EventController {
         user: req.userId,
         role: 'host',
         statusKey: false,
-        statusInvited: 'received'
+        statusInvited: 'received',
+        location: locationHost
       })
       await Event.updateOne({ _id: event._id }, {
         $push: {

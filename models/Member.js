@@ -12,6 +12,11 @@ const memberSchema = new Schema({
         ref: "User",
         required: [true, 'User is required']
     },
+    location: {
+        name: String,
+        lat: Number,
+        lon: Number,
+    },
     role: {
         type: String,
         enum: ['host', 'guest']

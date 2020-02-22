@@ -66,10 +66,11 @@ class MemberController {
 
     static updateStatusInvited(req, res, next) {
         const { memberId } = req.params
-        const { statusInvited } = req.body 
+        const { statusInvited, location } = req.body 
         Member
             .updateOne({ _id: memberId }, {
-                statusInvited
+                statusInvited,
+                location
             })
             .then(() => {
                 return Member
