@@ -24,7 +24,7 @@ const memberSchema = new Schema({
     },
     statusInvited: {
         type: String,
-        enum: ['pending', 'received', 'cancel']
+        enum: ['pending', 'received', 'refused']
     },
 })
 

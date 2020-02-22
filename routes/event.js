@@ -15,9 +15,12 @@ Router.post('/', authentication, createNewEvent);
 Router.get('/', authentication, getEvents);
 Router.get('/:eventId', authentication, getEventDetail);
 Router.put('/:eventId', authentication, updateEvent);
-Router.patch('/:eventId', authentication, handleEventStatus);
+Router.patch('/:eventId/status', authentication, handleEventStatus);
 Router.delete('/:eventId', authentication, deleteEvent);
 
 Router.post('/:eventId/members', authentication, MemberController.create)
+Router.get('/members/status-invited/pending', authentication, MemberController.getStatusInvitedPending)
+Router.delete('/:eventId/members/:memberId', authentication, MemberController.delete)
+Router.patch('/members/:memberId/status-invited', authentication, MemberController.updateStatusInvited)
 
 module.exports = Router;

@@ -32,6 +32,7 @@ describe('MEMBER', function () {
                         })
             })
             .then(res => {
+                global.token2 = res.body.token
                 dummiesUser.push(res.body._id)
                 done()
             })
@@ -66,12 +67,105 @@ describe('MEMBER', function () {
                     expect(res.body.members[0]).to.have.property('statusKey')
                     expect(res.body.members[0]).to.have.property('statusInvited')
                     expect(res.body.members[0].statusKey).to.not.be.ok;
+                    global.memberId = res.body.members[0]._id 
                     done()
                 })
                 .catch(console.log)
         })
     })
 
+
+    describe('PATCH /events/members/status-invited', function () {
+        it('should send object with status code 200', function (done) {
+            chai
+                .request(app)
+                .patch(`/events/members/${global.memberId}/status-invited`)
+                .send({
+                    statusInvited: 'received'
+                })
+                .set('authorization', global.token)
+                .then(res => {
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('object')
+                    expect(res.body).to.have.property('statusInvited')
+                    expect(res.body.statusInvited).to.equal('received')
+                    done()
+                }) 
+                .catch(console.log)
+        })
+    })
+
+    describe('PATCH /events/:eventId/status', function () {
+        it('should send object with status code 200', function (done) {
+            chai
+                .request(app)
+                .patch(`/events/${global.eventId}/status`)
+                .send({ status: 'ongoing' })
+                .set('authorization', global.token)
+                .then(res => {
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('object')
+                    expect(res.body).to.have.property('_id')
+                    expect(res.body).to.have.property('name')
+                    expect(res.body).to.have.property('time')
+                    expect(res.body).to.have.property('members')
+                    expect(res.body.members).to.be.an('array')
+                    expect(res.body.members.length).to.equal(3)
+                    expect(res.body.status).to.equal('ongoing')
+                    done()
+                })
+                .catch(console.log)
+        })
+    })
+
+    describe('GET /members/status-invited/pending', function () {
+        it('should send array with status code 200', function (done) {
+            chai
+                .request(app)
+                .get(`/events/members/status-invited/pending`)
+                .set('authorization', global.token2)
+                .then(res => {
+                    console.log(res.body)
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('array')
+                    expect(res.body.length).to.equal(1)
+                    expect(res.body[0].statusInvited).to.equal('pending')
+                    done()
+                })
+                .catch(console.log)
+        })
+    })
+
+    describe('DELETE /events/:eventId/members/memberId', function () {
+        it('should send object with status code 200', function (done) {
+            chai
+                .request(app)
+                .delete(`/events/${global.eventId}/members/${global.memberId}`)
+                .set('authorization', global.token)
+                .then(res => {
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('object')
+                    expect(res.body.ok).to.equal('ok')
+                    // done()
+                    return chai
+                        .request(app)
+                        .get(`/events/${global.eventId}`)
+                        .set('authorization', global.token)
+                })
+                .then(res => {
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('object')
+                    expect(res.body).to.have.property('_id')
+                    expect(res.body).to.have.property('name')
+                    expect(res.body).to.have.property('time')
+                    expect(res.body).to.have.property('members')
+                    expect(res.body.members).to.be.an('array')
+                    expect(res.body.members.length).to.equal(2)
+                    done()
+                })
+                .catch(console.log)
+        })
+    })
 
     describe('DELETE /events/:eventId', function () {  
         it('should send object with status code 200', function (done) {
