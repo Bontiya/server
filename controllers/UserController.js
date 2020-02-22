@@ -39,27 +39,23 @@ class UserController {
             return;
         }
 
-        const { name, email, username, gender } = req.body
+        const { name, email, username, gender, avatar } = req.body
         User
             .updateOne({ _id: req.userId }, { 
                 name, 
                 email, 
                 username, 
-                gender 
+                gender,
+                avatar
             })
             .then((res) => {
-                return User.findOne({ _id: req.userId })
+                return User
+                    .findOne({ _id: req.userId })
+                    .select('-password -provider')
             })
             .then(user => {
-                const { _id, name, email, gender, created_at, updated_at } = user
-                res.status(200).json({ 
-                    _id, 
-                    name, 
-                    email, 
-                    gender, 
-                    created_at, 
-                    updated_at 
-                })
+
+                res.status(200).json(user)
             })
             .catch(next)
     }

@@ -11,7 +11,8 @@ class AuthController {
                 email, 
                 password, 
                 gender,
-                provider: 'default'
+                provider: 'default',
+                avatar: 'https://img.icons8.com/wired/2x/small-smile.png'
             })
             .then(user => {
                 const token = jwt.sign({

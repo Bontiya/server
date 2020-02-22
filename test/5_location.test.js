@@ -10,7 +10,7 @@ chai.use(chaiHttp);
 
 const app = require('../app');
 
-describe.only('Location API', function() {
+describe('Location API', function() {
   describe('Query location', function() {
     it('Should send array of places prediction - status 202', async () => {
       const response = await chai.request(app)

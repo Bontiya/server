@@ -12,7 +12,8 @@ const dummyUserUpdate = {
     email: "dzakkiaz7@gmail.com", 
     username: "dzakki", 
     gender: "male",
-    newPassword: "dzakki1"
+    newPassword: "dzakki1",
+    avatar: "https://img.icons8.com/wired/2x/small-angry.png"
 }
 
 describe('USER SUCCESS', function () {  
@@ -61,6 +62,7 @@ describe('USER SUCCESS', function () {
                 .type('form')   
                 .send(dummyUserUpdate)
                 .then(res => {
+                    console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('_id')

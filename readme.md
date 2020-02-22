@@ -41,6 +41,7 @@
         name: 'Dzakki Achmed',
         email: 'dzakkiaz7@gmail.com',
         gender: 'male',
+        avatar: 'https://img.icons8.com/wired/2x/small-smile.png',
         created_at: '2020-02-22T08:13:25.688Z',
         updated_at: '2020-02-22T08:13:25.688Z'
     }
@@ -56,6 +57,7 @@
         name: 'Dzakki Achmed',
         email: 'dzakkiaz7@gmail.com',
         gender: 'male',
+        avatar: 'https://img.icons8.com/wired/2x/small-smile.png',
         created_at: '2020-02-22T08:13:25.688Z',
         updated_at: '2020-02-22T08:13:25.688Z'
     }]
@@ -72,6 +74,7 @@
         name: 'Ahmad muzakki baru',
         email: 'dzakkiaz7@gmail.com',
         gender: 'male',
+        avatar: 'https://img.icons8.com/wired/2x/small-angry.png',
         created_at: '2020-02-22T08:18:52.965Z',
         updated_at: '2020-02-22T08:18:53.292Z',
         __v: 0,
@@ -90,6 +93,7 @@
         name: 'Ahmad muzakki baru',
         email: 'dzakkiaz7@gmail.com',
         gender: 'male',
+        avatar: 'https://img.icons8.com/wired/2x/small-angry.png',
         created_at: '2020-02-22T08:18:52.965Z',
         updated_at: '2020-02-22T08:18:53.292Z',
         username: 'dzakki'

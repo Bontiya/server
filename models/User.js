@@ -29,6 +29,9 @@ const userSchema = new Schema({
         type: String,
         enum: ['male', 'female'],
     },
+    avatar: {
+        type: String,
+    },
     reputation: {
         type: String,
     },
