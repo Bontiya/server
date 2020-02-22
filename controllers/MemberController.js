@@ -4,14 +4,37 @@ const Event = require('../models/Event');
 class MemberController {
 
     static create(req, res, next) {
+        const { eventId } = req.params
         const promiseMembers = MemberController
-                                .createPromiseInsertMembers(req.body, req.params.eventid)
+                                .createPromiseInsertMembers(req.body, eventId)
+        
         Promise.all(promiseMembers)
             .then(members => {
-                console.log(members)
-                res.status(201).json(members)
+                // res.status(201).json(members)
+                const pushMember = []
+                members.forEach(member => {
+                    pushMember.push(member._id)
+                });
+                return Event.updateOne({ _id:  eventId}, {
+                    $push: {
+                        members: pushMember
+                    }
+                })
             })
-        .catch(next)
+            .then(() => {
+                return Event.findOne({ _id: eventId })
+                            .populate({
+                                path: 'members',
+                                populate: {
+                                    path: 'user',
+                                    select: '-password -provider'
+                                }
+                            })
+            })
+            .then(event => {
+                res.status(201).json(event)
+            })
+            .catch(next)
     }
 
 
@@ -21,8 +44,8 @@ class MemberController {
             promiseMembers.push(
                 Member
                     .create({
-                        eventId,
-                        userId: data.userId,
+                        event: eventId,
+                        user: data.userId,
                         role: data.role || 'guest',
                         statusKey: false,
                         statusInvited: 'pending'

@@ -55,11 +55,36 @@ describe('MEMBER', function () {
                 .send(members)
                 .set('authorization', global.token)
                 .then(res => {
-                    console.log(res.body)
+                    // console.log(res.body)
+                    expect(res).to.have.status(201)
+                    expect(res.body).to.be.an('object')
+                    expect(res.body.members).to.be.an('array')
+                    expect(res.body.members.length).to.equal(3)
+                    expect(res.body.members[0]).to.have.property('event')
+                    expect(res.body.members[0]).to.have.property('user')
+                    expect(res.body.members[0]).to.have.property('role')
+                    expect(res.body.members[0]).to.have.property('statusKey')
+                    expect(res.body.members[0]).to.have.property('statusInvited')
+                    expect(res.body.members[0].statusKey).to.not.be.ok;
                     done()
                 })
                 .catch(console.log)
         })
     })
 
+
+    describe('DELETE /events/:eventId', function () {  
+        it('should send object with status code 200', function (done) {
+            chai
+                .request(app)
+                .delete(`/events/${global.eventId}`)
+                .set('authorization', global.token)
+                .then(res => {
+                    expect(res).to.have.status(200)
+                    expect(res.body).to.be.an('object')
+                    expect(res.body._id).to.equal(global.eventId)
+                    done()
+                })
+        })
+    })
 })
