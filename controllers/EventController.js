@@ -4,7 +4,7 @@ const Event  = require('../models/Event');
 class EventController {
   static async createNewEvent(req, res, next) {
     try {
-      const { id } = req.token;
+      // const { id } = req.token;
       const { name, location, time, key } = req.body;
       const description = req.body.description || 'Description not available';
       const eventDetail = {
@@ -13,10 +13,11 @@ class EventController {
         time,
         key,
         description,
-        admin: id,
+        admin: req.userId,
+        status: 'scheduled'
       };
       const response = await Event.create(eventDetail);
-      res.status(201).json({ message: 'Event created!', response });
+      res.status(201).json(response);
     } catch (err) {
       next(err);
     }
