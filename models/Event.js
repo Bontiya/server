@@ -22,13 +22,13 @@ const EventSchema = new Schema({
   },
   status: {
     type: String,
+    enum: ['scheduled', 'onGoing', 'done'],
     required: true,
   },
-  members: [],
-  admin: {
+  members: [{
     type: Schema.Types.ObjectId,
-    required: true,
-  },
+    ref: "Member",
+  }],
 });
 
 EventSchema.pre('save', function(next) {
