@@ -13,7 +13,6 @@ router.get('/', function(req, res, next) {
 
 router.use('/auth', auth)
 router.use('/users', users)
-
 router.use('/events', event);
 router.use(errorHandler)
 
