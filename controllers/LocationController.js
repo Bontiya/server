@@ -4,6 +4,7 @@ const { Client } = require('elasticsearch');
 const client = new Client({
   host: process.env.ELASTICSEARCH_URI
 });
+const redis = require('../redis');
 
 
 class LocationContrller {
@@ -68,9 +69,10 @@ class LocationContrller {
           type: 'location-list' 
         })
       const place_prediction = [];
+      const dataBulk = [];
       const { data }  = await axios({
         method: 'GET',
-        url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&radius=500&limit=10&location=${lat},${lon}`
+        url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
       });
       for (let i = 0; i < data.predictions.length; i++) {
         const detail = {
@@ -78,12 +80,25 @@ class LocationContrller {
           name: data.predictions[i].structured_formatting.main_text,
           description: data.predictions[i].description
         };
+        dataBulk.push({
+          index:  {
+            _index:"place-suggestions", 
+            _type:"location-list"
+          }}, detail);
         place_prediction.push(detail);
       }
       if (hits.hits.hits.length < 1) {
+        client.bulk({
+          body: dataBulk
+        }, function (err, response) {
+          if (err) console.log(err, 'err')
+          else console.log('Prediction added to elastic');
+        })
         res.status(200).json(place_prediction);
       } else {
-        place_prediction.unshift(hits.hits.hits[0]._source)
+        hits.hits.hits.forEach((hit) => {
+          place_prediction.push(hit._source);
+        });
         res.status(200).json(place_prediction);
       }
     } catch (err) {
@@ -97,25 +112,13 @@ class LocationContrller {
         res.status(400).json({ errors: ['placeid is required!'] });
         return;
       }
-      const body = {
-        size: 200,
-        from: 0,
-        query: {
-          match: {
-            id: placeid,
-          },
-        },
-      };
-      const hits = await client.search({
-          index: 'place-suggestions',
-          body: body,
-          type: 'location-list',
-        })
-      if (hits.hits.hits.length < 1) {
+      const onRedis = await redis.get(placeid);
+      if (!onRedis) {
+        console.log('masukin ke redis')
         const { data } = await axios({
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${placeid}&fields=address_component,name,vicinity,geometry`
-        })
+        });
         const placeDetail = {
           id: placeid,
           name: data.result.name,
@@ -123,20 +126,41 @@ class LocationContrller {
           lat: data.result.geometry.location.lat,
           lon: data.result.geometry.location.lng
         };
-        client.bulk({
-          body: [
-            {
-              index: {
-                _index:"place-suggestions", 
-                _type:"location-list",}
-            },
-            placeDetail
-          ]
-        });
+        const redisValue = JSON.stringify(placeDetail);
+        redis.set(placeid, redisValue, 'EX', 86400);
         res.status(200).json(placeDetail);
       } else {
-        res.status(200).json(hits.hits.hits[0]._source);
+        const placeDetail = JSON.parse(onRedis);
+        res.status(200).json(placeDetail);
       }
+    } catch (err) {
+      next(err);
+    }
+  }
+  static async getTravelDuration(req, res, next) {
+    try {
+      const { origins, destination } = req.query
+      /** mode
+       * driving (default)
+       * walking
+       * bicycling
+       * transit
+       */
+      const mode = req.query.mode || 'driving'
+      const { data } = await axios({
+        method: 'GET',
+        url: `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${origins}&destinations=${destination}&key=${process.env.GOOGLE_MAP_KEY}&mode=${mode}`
+      })
+      const distanceDetail = {
+        originAddress: data.origin_addresses,
+        destinationAddress: data.destination_addresses,
+        distance: data.rows[0].elements[0].distance.text,
+        duration: {
+          seconds: data.rows[0].elements[0].duration.value,
+          durationText: data.rows[0].elements[0].duration,
+        },
+      };
+      res.status(200).json(distanceDetail)
     } catch (err) {
       next(err);
     }
