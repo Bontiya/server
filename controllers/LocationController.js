@@ -1,6 +1,5 @@
 'use strict';
 const axios = require('axios');
-// const client = require('../elasticsearch');
 const { Client } = require('elasticsearch');
 const client = new Client({
   host: 'http://localhost:9200'
@@ -8,6 +7,20 @@ const client = new Client({
 
 
 class LocationContrller {
+  static async reverseGeoLocation(req, res, next) {
+    try {
+      const { lat, lon } = req.query;
+      const { data } = await axios({
+        method: 'GET',
+        url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lat},${lon}&key=${process.env.GOOGLE_MAP_KEY}`
+      })
+      const response = { address: data.results[2].formatted_address };
+      res.status(200).json(response);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async queryLocation(req, res, next) {
     try {
       const { q, lat, lon } = req.query;
@@ -49,7 +62,6 @@ class LocationContrller {
   }
   static async getLocationDetail(req, res, next) {
     try {
-      // check di elasticsearch udah ada ato belum.
       const { placeid } = req.query;
       const body = {
         size: 200,
@@ -71,7 +83,6 @@ class LocationContrller {
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${placeid}&fields=address_component,name,vicinity,geometry`
         })
-        // place detail disimpan ke elasticsearch
         const placeDetail = {
           id: placeid,
           name: data.result.name,
