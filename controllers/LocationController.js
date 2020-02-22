@@ -2,7 +2,7 @@
 const axios = require('axios');
 const { Client } = require('elasticsearch');
 const client = new Client({
-  host: 'http://localhost:9200'
+  host: process.env.ELASTICSEARCH_URI
 });
 
 
