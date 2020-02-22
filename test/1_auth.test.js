@@ -15,7 +15,7 @@ const dummyUser = {
 global.dummyUser = dummyUser
 describe('AUTH SUCCESS', function () {
     describe('POST /auth/register', function () {  
-        it.only('should send object with status code 200', function (done) {  
+        it('should send object with status code 200', function (done) {  
             chai
                 .request(App)
                 .post('/auth/register')
