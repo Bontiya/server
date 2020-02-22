@@ -79,6 +79,7 @@ class LocationContrller {
           lat: data.result.geometry.location.lat,
           lon: data.result.geometry.location.lng
         };
+        // hello
         client.bulk({
           body: [
             {
