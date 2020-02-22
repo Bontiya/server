@@ -6,10 +6,16 @@ class AuthController {
     static register(req, res, next) {
         const { name, email, password, gender } = req.body
         User
-            .create({ name, email, password, gender })
+            .create({ 
+                name, 
+                email, 
+                password, 
+                gender,
+                provider: 'default'
+            })
             .then(user => {
                 const token = jwt.sign({
-                    _id: user._id,
+                    userId: user._id,
                     email: user.email
                 }, process.env.JWT_SECRET)
                 res.status(200).json({
@@ -38,7 +44,7 @@ class AuthController {
                     const passwordIsValid = checkPassword(password, user.password)
                     if (passwordIsValid) {
                         const token = jwt.sign({
-                            _id: user._id,
+                            userId: user._id,
                             email: user.email
                         }, process.env.JWT_SECRET)
                         res.status(200).json({
