@@ -73,4 +73,7 @@ describe.only('Location API', function() {
       expect(response.body.errors).to.include('latitude and longitude is required!');
     })
   })
+  // describe('Travel Duration', function () {
+  //   it('Should send duration detail', async () => )
+  // })
 })
