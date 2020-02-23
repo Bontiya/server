@@ -25,8 +25,8 @@ class LocationContrller {
         const polylineDecoding = polyline.decode(data.routes[0].overview_polyline.points)
         polylineDecoding.forEach((code) => {
           const detail = {
-            lat: code[0],
-            lon: code[1],
+            latitude: code[0],
+            longitude: code[1],
           };
           response.push(detail);
         })
