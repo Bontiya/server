@@ -96,34 +96,38 @@ class LocationContrller {
         })
       const place_prediction = [];
       const dataBulk = [];
-      const { data }  = await axios({
-        method: 'GET',
-        url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
-      });
-      for (let i = 0; i < data.predictions.length; i++) {
-        const detail = {
-          id: data.predictions[i].place_id,
-          name: data.predictions[i].structured_formatting.main_text,
-          description: data.predictions[i].description
-        };
-        dataBulk.push({
-          index:  {
-            _index:"place-suggestions", 
-            _type:"location-list"
-          }}, detail);
-        place_prediction.push(detail);
-      }
       if (hits.hits.hits.length < 1) {
+        const { data }  = await axios({
+          method: 'GET',
+          url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
+        });
+        for (let i = 0; i < data.predictions.length; i++) {
+          const detail = {
+            id: data.predictions[i].place_id,
+            name: data.predictions[i].structured_formatting.main_text,
+            description: data.predictions[i].description
+          };
+          dataBulk.push({
+            index:  {
+              _index:"place-suggestions", 
+              _type:"location-list"
+            }}, detail);
+          place_prediction.push(detail);
+        }
+        console.log('ke belum ada');
         client.bulk({
           body: dataBulk
         }, function (err) {
           if (err) next(err);
         })
+        console.log(place_prediction.length)
         res.status(200).json(place_prediction);
       } else {
+        console.log('ke udah ada')
         hits.hits.hits.forEach((hit) => {
           place_prediction.push(hit._source);
         });
+        console.log(place_prediction.length)
         res.status(200).json(place_prediction);
       }
     } catch (err) {
