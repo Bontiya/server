@@ -25,6 +25,9 @@ module.exports = function (err, req, res, next) {
     }else if (err.name === 'Forbidden') {
         status = 404
         msg = [err.errors[0].message]
+    }else if (err.code === 'EAI_AGAIN') {
+        status = 503
+        res.status(status).json({ errors: ['Service Unavailable'] });
     }
     console.log(msg)
     res.status(status).json({
