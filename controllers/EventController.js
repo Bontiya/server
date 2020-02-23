@@ -61,22 +61,24 @@ class EventController {
   }
 
   static async getEvents(req, res, next) {
-    let options = {
-      user: req.userId
-    };
+    let options = {};
     if (req.query.status) {
       options.status = req.query.status;
     }
+    // console.log(options);
     try {
-      const members = await Member.find(options).populate({
+      const members = await Member.find({
+        user: req.userId
+      }).populate({
         path: "event",
         populate: {
           ..._populateMember
-        }
+        },
+        match: options
       });
-      const events = [];
+      let events = [];
       members.forEach(member => {
-        events.push(member.event);
+        if (member.event) events.push(member.event);
       });
       res.status(200).json(events);
     } catch (error) {
