@@ -7,9 +7,20 @@ const client = new ImageAnnotatorClient({
 class GoogleVisionController {
   static async detectAnImage(req, res, next) {
     try {
-      // const response = await client.labelDetection('https://cdn.mos.cms.futurecdn.net/v5s9y4v4hM9P8tA6tdF3N4.jpg');
+      const { imageurl } = req.query;
+      const response = await client.labelDetection(imageurl);
+      const predictions = [];
+      response[0].labelAnnotations.forEach((prediction) => {
+        predictions.push({
+          name: prediction.description,
+          score: prediction.score,
+        });
+      });
+      res.status(200).json(predictions);
     } catch (error) {
       next(error);
     }
   }
 }
+
+module.exports = GoogleVisionController;
