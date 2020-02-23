@@ -32,6 +32,9 @@ class MemberController {
                             })
             })
             .then(event => {
+                if ( process.env.NODE_ENV !== 'test' ) {
+                    MemberController.notifToStatusInvitedPending(req.body, event ,req.app.get('socketio'));   
+                }
                 res.status(201).json(event)
             })
             .catch(next)
@@ -75,8 +78,43 @@ class MemberController {
             .then(() => {
                 return Member
                         .findById(memberId)
+                        .populate({
+                            path: 'event',
+                            populate: {
+                                path: 'members',
+                                match: { role: "host" }
+                            }
+                        })
+                        .populate({
+                            path: 'user',
+                            select: '-password -provider'
+                        })
             })
             .then((member) => {
+                if ( process.env.NODE_ENV !== 'test' ) { 
+                    const notifFrom = {
+                        memberId: member._id,
+                        userId: member.user._id,
+                        name: member.user.name,
+                        role: member.role,
+                        statusKey: member.statusKey,
+                        statusInvited: member.statusInvited
+                    }
+                    const eventData = {
+                        location: member.event.location,
+                        _id: member.event._id,
+                        name: member.event.name,
+                        time: member.event.time,
+                        key: member.event.key,
+                        status: member.event.status
+                    }
+                    MemberController.notifStatusInvitedUpdated(
+                        notifFrom,
+                        eventData,
+                        member.event.members,
+                        req.app.get('socketio')
+                    )
+                }
                 res.status(200).json(member)
             })
             .catch(next)
@@ -97,6 +135,23 @@ class MemberController {
                 res.status(200).json(member)
             })
             .catch(next)
+    }
+
+    static notifStatusInvitedUpdated(notifFrom, eventData, members, io) {
+        console.log('socketio StatusInvitedUpdated')
+        members.forEach(data => {
+            io.emit(`${data.user} StatusInvitedMemberUpdated`, {
+                notifFrom,
+                event: eventData 
+            })
+        })
+    }
+
+    static notifToStatusInvitedPending(members, event, io) {
+        console.log('socketio StatusInvitedPending')
+        members.forEach(data => {
+            io.emit(`${data.userId} StatusInvitedPending`, event)
+        })
     }
 
     static createPromiseInsertMembers (member, eventId) {
