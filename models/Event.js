@@ -30,7 +30,11 @@ const EventSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: "Member"
     }
-  ]
+  ],
+  description: {
+    type: String,
+    required: true
+  }
 });
 
 EventSchema.pre("save", function(next) {
