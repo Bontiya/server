@@ -5,49 +5,77 @@ const client = new Client({
   host: process.env.ELASTICSEARCH_URI
 });
 const redis = require('../redis');
+const polyline = require('@mapbox/polyline');
 
 
 class LocationContrller {
+  static async routes(req, res, next) {
+    try {
+      const { origin, destination } = req.query;
+      const { data } = await axios({
+        method: 'GET',
+        url: `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}
+        &destination=${destination}&key=${process.env.GOOGLE_MAP_KEY}`
+      });
+      if (data.status === 'NOT_FOUND' || data.status === 'ZERO_RESULTS') {
+        // how to catch this error on errHandler?
+        throw new Error('Location Not Found');
+      } else {
+        const response = [];
+        const polylineDecoding = polyline.decode(data.routes[0].overview_polyline.points)
+        polylineDecoding.forEach((code) => {
+          const detail = {
+            latitude: code[0],
+            longitude: code[1],
+          };
+          response.push(detail);
+        })
+        res.status(200).json(response);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+  
   static async reverseGeoLocation(req, res, next) {
     try {
       const { lat, lon } = req.query;
       if (!lat || !lon) {
         res.status(400).json({ errors: ['latitude and longitude is required!'] });
-        return;
-      }
-      const { data } = await axios({
-        method: 'GET',
-        url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lat},${lon}&key=${process.env.GOOGLE_MAP_KEY}`
-      })
-      const placesId = [];
-      for (let i = 0; i < data.results.length; i++) {
-        placesId.push(data.results[i].place_id);
-      }
-      const placesName = [];
-      const promises = []
-      placesId.forEach((id) => {
-        promises.push(axios({
+      } else {
+        const { data } = await axios({
           method: 'GET',
-          url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${id}&fields=name`
-        }))
-      })
-      Promise
-        .all(promises)
-        .then((results) => {
-          results.forEach(result => {
-            placesName.push(result.data.result.name)
-          })
-          res.status(200).json(placesName);
+          url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lat},${lon}&key=${process.env.GOOGLE_MAP_KEY}`
         })
-        .catch(next)
+        const placesId = [];
+        for (let i = 0; i < data.results.length; i++) {
+          placesId.push(data.results[i].place_id);
+        }
+        const placesName = [];
+        const promises = []
+        placesId.forEach((id) => {
+          promises.push(axios({
+            method: 'GET',
+            url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${id}&fields=name`
+          }))
+        })
+        Promise
+          .all(promises)
+          .then((results) => {
+            results.forEach(result => {
+              placesName.push(result.data.result.name)
+            })
+            res.status(200).json(placesName);
+          })
+          .catch(next)
+      }
     } catch (err) {
       next(err);
     }
   }
-
   static async queryLocation(req, res, next) {
     try {
-      const { q, lat, lon } = req.query;
+      const { q } = req.query;
       if (!q) {
         res.status(400).json({ errors: ['query q is required as location name'] });
         return;
@@ -57,9 +85,7 @@ class LocationContrller {
         from: 0,
         query: {
           match: {
-            name: {
-              query: q
-            },
+            name: q
           },
         },
       };
@@ -90,9 +116,8 @@ class LocationContrller {
       if (hits.hits.hits.length < 1) {
         client.bulk({
           body: dataBulk
-        }, function (err, response) {
-          if (err) console.log(err, 'err')
-          else console.log('Prediction added to elastic');
+        }, function (err) {
+          if (err) next(err);
         })
         res.status(200).json(place_prediction);
       } else {
@@ -114,7 +139,6 @@ class LocationContrller {
       }
       const onRedis = await redis.get(placeid);
       if (!onRedis) {
-        console.log('masukin ke redis')
         const { data } = await axios({
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${placeid}&fields=address_component,name,vicinity,geometry`
