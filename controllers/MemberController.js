@@ -133,7 +133,15 @@ class MemberController {
       statusInvited: "pending"
     })
       .populate({
-        path: "event"
+        path: "event",
+        populate: {
+          path: "members",
+          match: { role: "host" },
+          populate: {
+            path: "user",
+            select: "-password -provider"
+          }
+        }
       })
       .then(member => {
         res.status(200).json(member);
@@ -142,7 +150,10 @@ class MemberController {
   }
 
   static notifStatusInvitedUpdated(notifFrom, eventData, members, io) {
-    console.log("socketio StatusInvitedUpdated");
+    console.log(`${members[0].user} socketio StatusInvitedUpdated`);
+    if (notifFrom.statusInvited === "received") {
+      io.emit(`${notifFrom.userId} myAcceptedEvent`, "success accepted event");
+    }
     members.forEach(data => {
       io.emit(`${data.user} StatusInvitedMemberUpdated`, {
         notifFrom,
