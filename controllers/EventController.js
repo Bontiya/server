@@ -68,7 +68,8 @@ class EventController {
     // console.log(options);
     try {
       const members = await Member.find({
-        user: req.userId
+        user: req.userId,
+        statusInvited: "received"
       }).populate({
         path: "event",
         populate: {
