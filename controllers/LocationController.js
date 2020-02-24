@@ -96,7 +96,7 @@ class LocationContrller {
         })
       const place_prediction = [];
       const dataBulk = [];
-      if (hits.hits.hits.length < 1) {
+      if (!hits.hits.max_score) {
         const { data }  = await axios({
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
@@ -114,27 +114,23 @@ class LocationContrller {
             }}, detail);
           place_prediction.push(detail);
         }
-        console.log('ke belum ada');
         client.bulk({
           body: dataBulk
         }, function (err) {
           if (err) next(err);
         })
-        console.log(place_prediction.length)
         res.status(200).json(place_prediction);
       } else {
-        console.log('ke udah ada')
         hits.hits.hits.forEach((hit) => {
           place_prediction.push(hit._source);
         });
-        console.log(place_prediction.length)
         res.status(200).json(place_prediction);
       }
     } catch (err) {
       next(err);
     }
   }
-  static async getLocationDetail(req, res, next) {
+  static async  getLocationDetail(req, res, next) {
     try {
       const { placeid } = req.query;
       if (!placeid) {
