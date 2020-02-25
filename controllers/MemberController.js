@@ -1,6 +1,7 @@
 const Member = require("../models/Member");
 const Event = require("../models/Event");
 const admin = require('firebase-admin')
+admin.initializeApp();
 
 class MemberController {
   static create(req, res, next) {
