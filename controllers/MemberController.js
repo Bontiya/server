@@ -184,6 +184,19 @@ class MemberController {
     });
     return promiseMembers;
   }
+
+  static updateStatusKey(req, res, next) {
+    console.log('update status key benar')
+    Member.update({
+      _id: req.params.memberId
+    }, {
+      statusKey: true
+    })
+      .then(data => {
+        res.status(200).json(data)
+      })
+      .catch(next)
+  }
 }
 
 module.exports = MemberController;
