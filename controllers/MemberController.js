@@ -36,7 +36,6 @@ class MemberController {
         });
       })
       .then(event => {
-        console.log(req.body,req.params, '==-=-=-=-=-=')
         const io = req.app.get("socketio");
         if (process.env.NODE_ENV !== "test" && io) {
           MemberController.notifToStatusInvitedPending(req.body, event, io);
