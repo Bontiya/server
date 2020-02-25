@@ -7,8 +7,8 @@ const client = new ImageAnnotatorClient({
 class GoogleVisionController {
   static async detectAnImage(req, res, next) {
     try {
-      const { imageurl } = req.query;
-      const response = await client.labelDetection(imageurl);
+      const { data } = req.body
+      const response = await client.labelDetection(Buffer.from(data.baseImg, 'base64'));
       const predictions = [];
       response[0].labelAnnotations.forEach((prediction) => {
         predictions.push({

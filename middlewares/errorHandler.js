@@ -1,5 +1,5 @@
 module.exports = function(err, req, res, next) {
-  // console.log(err, 'error handler')
+  console.log(err, 'error handler')
   let status = 500;
   let msg = ["internal server error"];
 
