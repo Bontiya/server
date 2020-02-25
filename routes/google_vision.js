@@ -19,6 +19,6 @@ const {
 // Router.post('/upload-image', upload.single('file'), (req, res) => {
 //   res.status(200).json(req.body);
 // })
-Router.get('/detect', detectAnImage);
+Router.post('/detect', detectAnImage);
 
 module.exports = Router;
