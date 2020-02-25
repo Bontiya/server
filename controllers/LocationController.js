@@ -2,7 +2,13 @@
 const axios = require('axios');
 const { Client } = require('elasticsearch');
 const client = new Client({
-  host: process.env.ELASTICSEARCH_URI
+  node: process.env.ELASTICSEARCH_URI,
+  auth: {
+    auth: {
+      username: process.env.ELASTIC_USERNAME,
+      password: process.env.ELASTIC_PASSWORD,
+    },
+  }
 });
 const redis = require('../redis');
 const polyline = require('@mapbox/polyline');

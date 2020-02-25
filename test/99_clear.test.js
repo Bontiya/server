@@ -14,7 +14,6 @@ describe('clear', function () {
         
         Promise.all(promiseyArr)
             .then(result => {
-                console.log(result)
                 done()
             })
     })

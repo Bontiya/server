@@ -1,5 +1,4 @@
 module.exports = function(err, req, res, next) {
-  // console.log(err, 'error handler')
   let status = 500;
   let msg = ["internal server error"];
 
@@ -29,7 +28,6 @@ module.exports = function(err, req, res, next) {
     status = 503;
     res.status(status).json({ errors: ["Service Unavailable"] });
   }
-  console.log(msg);
   res.status(status).json({
     errors: msg
   });

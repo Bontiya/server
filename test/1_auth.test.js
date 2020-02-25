@@ -31,8 +31,6 @@ describe('AUTH SUCCESS', function () {
                     done()
                 })
                 .catch(err => {
-                    console.log('error test register')
-                    console.log(err)
                 })
         })
     })
@@ -59,7 +57,6 @@ describe('AUTH SUCCESS', function () {
                     done()
                 })
                 .catch(err => {
-                    console.log(err)
                 })
         })
     })
@@ -80,8 +77,6 @@ describe('AUTH ERRORS', function () {
                     done()
                 })
                 .catch(err => {
-                    console.log('error test register')
-                    console.log(err)
                 })
         })
     })
@@ -99,8 +94,6 @@ describe('AUTH ERRORS', function () {
                     done()
                 })
                 .catch(err => {
-                    console.log('error test register')
-                    console.log(err)
                 })
         })
     })
@@ -119,8 +112,6 @@ describe('AUTH ERRORS', function () {
                     done()
                 })
                 .catch(err => {
-                    console.log('error test login')
-                    console.log(err)
                 })
         })
     })

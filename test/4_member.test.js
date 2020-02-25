@@ -36,7 +36,7 @@ describe('MEMBER', function () {
                 dummiesUser.push(res.body._id)
                 done()
             })
-            .catch(console.log)
+            .catch()
     })
 
     describe('POST /events/:eventid/members', function () {
@@ -56,7 +56,6 @@ describe('MEMBER', function () {
                 .send(members)
                 .set('authorization', global.token)
                 .then(res => {
-                    console.log(res.body, '==========')
                     expect(res).to.have.status(201)
                     expect(res.body).to.be.an('object')
                     expect(res.body.members).to.be.an('array')
@@ -70,7 +69,7 @@ describe('MEMBER', function () {
                     global.memberId = res.body.members[0]._id 
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 
@@ -90,14 +89,13 @@ describe('MEMBER', function () {
                 })
                 .set('authorization', global.token)
                 .then(res => {
-                    console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('statusInvited')
                     expect(res.body.statusInvited).to.equal('received')
                     done()
                 }) 
-                .catch(console.log)
+                .catch()
         })
     })
 
@@ -120,7 +118,7 @@ describe('MEMBER', function () {
                     expect(res.body.status).to.equal('done')
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 
@@ -131,14 +129,13 @@ describe('MEMBER', function () {
                 .get(`/events/members/status-invited/pending`)
                 .set('authorization', global.token2)
                 .then(res => {
-                    // console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('array')
                     expect(res.body.length).to.equal(1)
                     expect(res.body[0].statusInvited).to.equal('pending')
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 
@@ -152,7 +149,6 @@ describe('MEMBER', function () {
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body.ok).to.equal('ok')
-                    // done()
                     return chai
                         .request(app)
                         .get(`/events/${global.eventId}`)
@@ -169,7 +165,7 @@ describe('MEMBER', function () {
                     expect(res.body.members.length).to.equal(2)
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 
