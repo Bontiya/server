@@ -100,6 +100,50 @@ class LocationContrller {
         })
       const place_prediction = [];
       const dataBulk = [];
+      if (!hits.hits.max_score) {
+        const { data }  = await axios({
+          method: 'GET',
+          url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
+        });
+        for (let i = 0; i < data.predictions.length; i++) {
+          const detail = {
+            id: data.predictions[i].place_id,
+            name: data.predictions[i].structured_formatting.main_text,
+            description: data.predictions[i].description
+          };
+          dataBulk.push({
+            index:  {
+              _index:"place-suggestions", 
+              _type:"location-list"
+            }}, detail);
+          place_prediction.push(detail);
+        }
+        client.bulk({
+          body: dataBulk
+        }, function (err) {
+          if (err) next(err);
+        })
+        res.status(200).json(place_prediction);
+      } else {
+        hits.hits.hits.forEach((hit) => {
+          place_prediction.push(hit._source);
+        });
+        res.status(200).json(place_prediction);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async backupQuery(req, res, next) {
+    try {
+      const { q } = req.query;
+      if (!q) {
+        res.status(400).json({ errors: ['query q is required as location name'] });
+        return;
+      };
+      const place_prediction = [];
+      const dataBulk = [];
       const { data }  = await axios({
         method: 'GET',
         url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
@@ -110,26 +154,9 @@ class LocationContrller {
           name: data.predictions[i].structured_formatting.main_text,
           description: data.predictions[i].description
         };
-        dataBulk.push({
-          index:  {
-            _index:"place-suggestions", 
-            _type:"location-list"
-          }}, detail);
         place_prediction.push(detail);
       }
-      client.bulk({
-        body: dataBulk
-      }, function (err) {
-        if (err) next(err);
-      })
       res.status(200).json(place_prediction);
-      // if (!hits.hits.max_score) {
-      // } else {
-      //   hits.hits.hits.forEach((hit) => {
-      //     place_prediction.push(hit._source);
-      //   });
-      //   res.status(200).json(place_prediction);
-      // }
     } catch (err) {
       next(err);
     }
