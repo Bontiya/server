@@ -128,6 +128,15 @@ class UserController {
             })
             .catch(next)
     }
+
+    static async getAllUser( req, res, next ) {
+        try {
+            res.status(200).json( await User.find({}))
+        }
+        catch ( err ) {
+            next( err )
+        }
+    }
 }
 
 module.exports = UserController

@@ -3,6 +3,7 @@ const UserController = require('../controllers/UserController');
 const authentication = require('../middlewares/authentication');
 const preUserUpdatePassword = require('../middlewares/preUserUpdatePassword');
 
+router.get('/',authentication, UserController.getAllUser)
 router.put('/', authentication, UserController.update);
 router.patch('/password', [authentication, preUserUpdatePassword], UserController.updatePassword);
 router.get('/search', authentication, UserController.getUserBySearch);

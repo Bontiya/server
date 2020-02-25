@@ -96,24 +96,24 @@ class LocationContrller {
         })
       const place_prediction = [];
       const dataBulk = [];
-      const { data }  = await axios({
-        method: 'GET',
-        url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
-      });
-      for (let i = 0; i < data.predictions.length; i++) {
-        const detail = {
-          id: data.predictions[i].place_id,
-          name: data.predictions[i].structured_formatting.main_text,
-          description: data.predictions[i].description
-        };
-        dataBulk.push({
-          index:  {
-            _index:"place-suggestions", 
-            _type:"location-list"
-          }}, detail);
-        place_prediction.push(detail);
-      }
-      if (hits.hits.hits.length < 1) {
+      if (!hits.hits.max_score) {
+        const { data }  = await axios({
+          method: 'GET',
+          url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
+        });
+        for (let i = 0; i < data.predictions.length; i++) {
+          const detail = {
+            id: data.predictions[i].place_id,
+            name: data.predictions[i].structured_formatting.main_text,
+            description: data.predictions[i].description
+          };
+          dataBulk.push({
+            index:  {
+              _index:"place-suggestions", 
+              _type:"location-list"
+            }}, detail);
+          place_prediction.push(detail);
+        }
         client.bulk({
           body: dataBulk
         }, function (err) {
@@ -130,7 +130,7 @@ class LocationContrller {
       next(err);
     }
   }
-  static async getLocationDetail(req, res, next) {
+  static async  getLocationDetail(req, res, next) {
     try {
       const { placeid } = req.query;
       if (!placeid) {

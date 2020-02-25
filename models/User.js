@@ -38,6 +38,9 @@ const userSchema = new Schema({
     provider: {
         type: String,
         enum: ['default', 'google'],
+    },
+    tokenDeviceFirebase: {
+        type: String
     }
 },{
     timestamps: { 
