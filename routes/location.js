@@ -6,9 +6,10 @@ const {
   reverseGeoLocation,
   getTravelDuration,
   routes,
+  backupQuery
 } = require('../controllers/LocationController');
 
-Router.get('/search', queryLocation);
+Router.get('/search', backupQuery);
 Router.get('/detail', getLocationDetail);
 Router.get('/reverse', reverseGeoLocation);
 Router.get('/duration', getTravelDuration);

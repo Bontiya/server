@@ -72,7 +72,6 @@ class EventController {
     if (req.query.status) {
       options.status = req.query.status;
     }
-    // console.log(options);
     try {
       const members = await Member.find({
         user: req.userId,

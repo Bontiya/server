@@ -2,7 +2,11 @@
 const axios = require('axios');
 const { Client } = require('elasticsearch');
 const client = new Client({
-  host: process.env.ELASTICSEARCH_URI
+  node: process.env.ELASTICSEARCH_URI,
+  auth: {
+    username: process.env.ELASTIC_USERNAME,
+    password: process.env.ELASTIC_PASSWORD,
+  },
 });
 const redis = require('../redis');
 const polyline = require('@mapbox/polyline');
@@ -126,6 +130,33 @@ class LocationContrller {
         });
         res.status(200).json(place_prediction);
       }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async backupQuery(req, res, next) {
+    try {
+      const { q } = req.query;
+      if (!q) {
+        res.status(400).json({ errors: ['query q is required as location name'] });
+        return;
+      };
+      const place_prediction = [];
+      const dataBulk = [];
+      const { data }  = await axios({
+        method: 'GET',
+        url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
+      });
+      for (let i = 0; i < data.predictions.length; i++) {
+        const detail = {
+          id: data.predictions[i].place_id,
+          name: data.predictions[i].structured_formatting.main_text,
+          description: data.predictions[i].description
+        };
+        place_prediction.push(detail);
+      }
+      res.status(200).json(place_prediction);
     } catch (err) {
       next(err);
     }
