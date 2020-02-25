@@ -33,7 +33,6 @@ describe('EVENT', function () {
                 .send(dummyEvent)
                 .set('authorization', global.token)
                 .then(res => {
-                    // console.log(res.body)
                     expect(res).to.have.status(201)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('_id')
@@ -46,7 +45,7 @@ describe('EVENT', function () {
                     global.eventId = res.body._id
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 
@@ -57,7 +56,6 @@ describe('EVENT', function () {
                 .get(`/events`)
                 .set('authorization', global.token)
                 .then(res => {
-                    // console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('array')
                     expect(res.body[0]).to.have.property('_id')
@@ -68,7 +66,7 @@ describe('EVENT', function () {
                     expect(res.body[0].members.length).to.equal(1)
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 
@@ -79,8 +77,6 @@ describe('EVENT', function () {
                 .get(`/events/${global.eventId}`)
                 .set('authorization', global.token)
                 .then(res => {
-                    // console.log(global.userId)
-                    // console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('_id')
@@ -91,7 +87,7 @@ describe('EVENT', function () {
                     expect(res.body.members.length).to.equal(1)
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 
@@ -116,7 +112,6 @@ describe('EVENT', function () {
                 .send(dummyUpdateEvent)
                 .set('authorization', global.token)
                 .then(res => {
-                    // console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('_id')
@@ -130,7 +125,7 @@ describe('EVENT', function () {
                     expect(res.body.key).to.equal(dummyUpdateEvent.key)
                     done()
                 })
-                .catch(console.log)
+                .catch()
         })
     })
 })

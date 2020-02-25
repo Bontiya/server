@@ -62,7 +62,6 @@ describe('USER SUCCESS', function () {
                 .type('form')   
                 .send(dummyUserUpdate)
                 .then(res => {
-                    console.log(res.body)
                     expect(res).to.have.status(200)
                     expect(res.body).to.be.an('object')
                     expect(res.body).to.have.property('_id')
@@ -75,7 +74,6 @@ describe('USER SUCCESS', function () {
                     done()
                 })
                 .catch(err => {
-                    console.log(err)
                 })
         })
     })

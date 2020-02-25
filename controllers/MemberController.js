@@ -37,7 +37,6 @@ class MemberController {
         });
       })
       .then(event => {
-        console.log(req.body,req.params, '==-=-=-=-=-=')
         const io = req.app.get("socketio");
         const membersFirebaseToken = req.body[0].membersFirebaseToken
         if (process.env.NODE_ENV !== "test" && io) {
