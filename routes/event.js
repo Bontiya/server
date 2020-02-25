@@ -24,5 +24,6 @@ Router.post('/:eventId/members', [authentication, checkEventId], MemberControlle
 Router.get('/members/status-invited/pending', authentication, MemberController.getStatusInvitedPending)
 Router.delete('/:eventId/members/:memberId', [authentication, checkEventId, checkMemberId], MemberController.delete)
 Router.patch('/members/:memberId/status-invited', [authentication, checkMemberId], MemberController.updateStatusInvited)
+Router.patch('/members/:memberId/status-key', [authentication, checkMemberId], MemberController.updateStatusKey)
 
 module.exports = Router;
