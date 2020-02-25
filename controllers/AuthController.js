@@ -64,6 +64,17 @@ class AuthController {
             })
             .catch(next)
     }
+
+    static async deviceTokenFirebase ( req,res,next ) {
+        try {
+            res.status(201).json(await User.updateOne({_id: req.userId},{
+                tokenDeviceFirebase: req.body.tokenDeviceFirebase
+            }))
+        }
+        catch ( err ) {
+            next ( err )
+        }
+    }
 }
 
 module.exports = AuthController;

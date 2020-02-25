@@ -51,9 +51,16 @@ class EventController {
   static async getEventDetail(req, res, next) {
     try {
       const { eventId } = req.params;
-      const detail = await Event.findOne({ _id: eventId }).populate(
-        _populateMember
-      );
+      const detail = await Event.findOne({ _id: eventId }).populate({
+        ..._populateMember,
+        match: {
+          statusInvited: {
+            $not: {
+              $eq: "refused"
+            }
+          }
+        }
+      });
       res.status(200).json(detail);
     } catch (err) {
       next(err);
@@ -68,7 +75,8 @@ class EventController {
     // console.log(options);
     try {
       const members = await Member.find({
-        user: req.userId
+        user: req.userId,
+        statusInvited: "received"
       }).populate({
         path: "event",
         populate: {
