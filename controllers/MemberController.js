@@ -1,5 +1,6 @@
 const Member = require("../models/Member");
 const Event = require("../models/Event");
+const admin = require('firebase-admin')
 
 class MemberController {
   static create(req, res, next) {
@@ -38,9 +39,16 @@ class MemberController {
       .then(event => {
         console.log(req.body,req.params, '==-=-=-=-=-=')
         const io = req.app.get("socketio");
+        const membersFirebaseToken = req.body[0].membersFirebaseToken
         if (process.env.NODE_ENV !== "test" && io) {
           MemberController.notifToStatusInvitedPending(req.body, event, io);
         }
+        admin.messaging().sendMulticast({
+          membersFirebaseToken,
+          data: {
+            message : 'A member has been added'
+          }
+        })
         res.status(201).json(event);
       })
       .catch(next);
