@@ -14,7 +14,16 @@ const EventSchema = new Schema({
   },
   time: {
     type: String,
-    required: [true, "Time cannot be empty"]
+    required: [true, "Time cannot be empty"],
+    validate: {
+      validator: function (v) {
+        const dateNow = new Date().getTime()
+        const dateEvent = new Date(v).getTime()
+        if (dateNow >= dateEvent) return false
+        return true
+      },
+      message: 'date must be future'
+    }
   },
   key: {
     type: String,
