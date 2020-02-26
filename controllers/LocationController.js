@@ -1,14 +1,7 @@
 'use strict';
 const axios = require('axios');
-const { Client } = require('elasticsearch');
-const client = new Client({
-  node: process.env.ELASTICSEARCH_URI,
-  auth: {
-    username: process.env.ELASTIC_USERNAME,
-    password: process.env.ELASTIC_PASSWORD,
-  },
-});
-const redis = require('../redis');
+const client = require('../config/elasticClient');
+const redis = require('../config/redis');
 const polyline = require('@mapbox/polyline');
 
 
@@ -22,7 +15,6 @@ class LocationContrller {
         &destination=${destination}&key=${process.env.GOOGLE_MAP_KEY}`
       });
       if (data.status === 'NOT_FOUND' || data.status === 'ZERO_RESULTS') {
-        // how to catch this error on errHandler?
         throw new Error('Location Not Found');
       } else {
         const response = [];
@@ -50,13 +42,13 @@ class LocationContrller {
         const { data } = await axios({
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/geocode/json?address=${lat},${lon}&key=${process.env.GOOGLE_MAP_KEY}`
-        })
+        });
         const placesId = [];
         for (let i = 0; i < data.results.length; i++) {
           placesId.push(data.results[i].place_id);
         }
         const placesName = [];
-        const promises = []
+        const promises = [];
         placesId.forEach((id) => {
           promises.push(axios({
             method: 'GET',
@@ -71,7 +63,7 @@ class LocationContrller {
             })
             res.status(200).json(placesName);
           })
-          .catch(next)
+          .catch(next);
       }
     } catch (err) {
       next(err);
@@ -96,8 +88,8 @@ class LocationContrller {
       const hits = await client.search({
           index: 'place-suggestions',
           body: body,
-          type: 'location-list' 
-        })
+          type: 'location-list',
+        });
       const place_prediction = [];
       if (hits.hits.max_score) {
         let isExist = false;
@@ -116,26 +108,23 @@ class LocationContrller {
               const detail = {
                 id: predict.place_id,
                 name: predict.structured_formatting.main_text,
-                description: predict.description
+                description: predict.description,
               };
               place_prediction.unshift(detail)
               client.index({
                 index: 'place-suggestions',
                 type: 'location-list',
                 body: detail,
-              }, function(err, response, status) {
-                if (err) console.log(err, 'error')
-                else console.log(response, 'Index ');
               });
             } else {
               const detail = {
                 id: predict.place_id,
                 name: predict.structured_formatting.main_text,
-                description: predict.description
+                description: predict.description,
               };
-              place_prediction.unshift(detail)
+              place_prediction.unshift(detail);
             }
-          })
+          });
         }
         hits.hits.hits.forEach((hit) => {
           place_prediction.push(hit._source);
@@ -146,21 +135,17 @@ class LocationContrller {
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
         });
-        console.log(data);
         for (let i = 0; i < data.predictions.length; i++) {
           const detail = {
             id: data.predictions[i].place_id,
             name: data.predictions[i].structured_formatting.main_text,
             description: data.predictions[i].description
           };
-          // client.index({
-          //   index: 'place-suggestions',
-          //   type: 'location-list',
-          //   body: detail,
-          // }, function(err, response, status) {
-          //   if (err) console.log(err, 'error')
-          //   else console.log(response, 'Index ');
-          // });
+          client.index({
+            index: 'place-suggestions',
+            type: 'location-list',
+            body: detail,
+          });
           place_prediction.push(detail);
         }
         res.status(200).json(place_prediction);
@@ -178,7 +163,6 @@ class LocationContrller {
         return;
       };
       const place_prediction = [];
-      const dataBulk = [];
       const { data }  = await axios({
         method: 'GET',
         url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
@@ -201,27 +185,27 @@ class LocationContrller {
       const { placeid } = req.query;
       if (!placeid) {
         res.status(400).json({ errors: ['placeid is required!'] });
-        return;
-      }
-      const onRedis = await redis.get(placeid);
-      if (!onRedis) {
-        const { data } = await axios({
-          method: 'GET',
-          url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${placeid}&fields=address_component,name,vicinity,geometry`
-        });
-        const placeDetail = {
-          id: placeid,
-          name: data.result.name,
-          description: data.result.vicinity,
-          lat: data.result.geometry.location.lat,
-          lon: data.result.geometry.location.lng
-        };
-        const redisValue = JSON.stringify(placeDetail);
-        redis.set(placeid, redisValue, 'EX', 86400);
-        res.status(200).json(placeDetail);
       } else {
-        const placeDetail = JSON.parse(onRedis);
-        res.status(200).json(placeDetail);
+        const onRedis = await redis.get(placeid);
+        if (!onRedis) {
+          const { data } = await axios({
+            method: 'GET',
+            url: `https://maps.googleapis.com/maps/api/place/details/json?key=${process.env.GOOGLE_MAP_KEY}&place_id=${placeid}&fields=address_component,name,vicinity,geometry`
+          });
+          const placeDetail = {
+            id: placeid,
+            name: data.result.name,
+            description: data.result.vicinity,
+            lat: data.result.geometry.location.lat,
+            lon: data.result.geometry.location.lng,
+          };
+          const redisValue = JSON.stringify(placeDetail);
+          redis.set(placeid, redisValue, 'EX', 86400);
+          res.status(200).json(placeDetail);
+        } else {
+          const placeDetail = JSON.parse(onRedis);
+          res.status(200).json(placeDetail);
+        }
       }
     } catch (err) {
       next(err);
@@ -229,20 +213,14 @@ class LocationContrller {
   }
   static async getTravelDuration(req, res, next) {
     try {
-      const { origins, destination } = req.query
-      /** mode
-       * driving (default)
-       * walking
-       * bicycling
-       * transit
-       */
-      const mode = req.query.mode || 'driving'
+      const { origins, destination } = req.query;
+      const mode = req.query.mode || 'driving';
       const { data } = await axios({
         method: 'GET',
         url: `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${origins}&destinations=${destination}&key=${process.env.GOOGLE_MAP_KEY}&mode=${mode}`
-      })
+      });
       if (data.rows[0].elements[0].status === 'ZERO_RESULTS') {
-        res.status(400).json({ errros: ['Location not found!'] })
+        res.status(400).json({ errros: ['Location not found!'] });
       } else {
         const distanceDetail = {
           originAddress: data.origin_addresses,
@@ -253,7 +231,7 @@ class LocationContrller {
             durationText: data.rows[0].elements[0].duration,
           },
         };
-        res.status(200).json(distanceDetail)
+        res.status(200).json(distanceDetail);
       }
     } catch (err) {
       next(err);
