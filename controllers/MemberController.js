@@ -197,7 +197,7 @@ class MemberController {
     try {
       const { lat, lon } = req.body;
       const response = Member.updateMany(
-        { user: req.params.userId },
+        { user: req.userId },
         { $set: { 'location.lat': Number(lat), 'location.lon': Number(lon) } },
       );
       res.status(200).json(response);
