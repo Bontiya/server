@@ -99,35 +99,70 @@ class LocationContrller {
           type: 'location-list' 
         })
       const place_prediction = [];
-      const dataBulk = [];
-      if (hits.hits.max_score < 7) {
+      if (hits.hits.max_score) {
+        let isExist = false;
+        hits.hits.hits.forEach((hit) => {
+          if (hit._source.name.toLowerCase() === q.toLowerCase()) {
+            isExist = true; 
+          }
+        });
+        if (!isExist) {
+          const { data }  = await axios({
+            method: 'GET',
+            url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
+          });
+          data.predictions.forEach((predict) => {
+            if (q.toLowerCase() === predict.structured_formatting.main_text.toLowerCase()) {
+              const detail = {
+                id: predict.place_id,
+                name: predict.structured_formatting.main_text,
+                description: predict.description
+              };
+              place_prediction.unshift(detail)
+              client.index({
+                index: 'place-suggestions',
+                type: 'location-list',
+                body: detail,
+              }, function(err, response, status) {
+                if (err) console.log(err, 'error')
+                else console.log(response, 'Index ');
+              });
+            } else {
+              const detail = {
+                id: predict.place_id,
+                name: predict.structured_formatting.main_text,
+                description: predict.description
+              };
+              place_prediction.unshift(detail)
+            }
+          })
+        }
+        hits.hits.hits.forEach((hit) => {
+          place_prediction.push(hit._source);
+        });
+        res.status(200).json(place_prediction);
+      } else {
         const { data }  = await axios({
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
         });
+        console.log(data);
         for (let i = 0; i < data.predictions.length; i++) {
           const detail = {
             id: data.predictions[i].place_id,
             name: data.predictions[i].structured_formatting.main_text,
             description: data.predictions[i].description
           };
-          dataBulk.push({
-            index:  {
-              _index:"place-suggestions", 
-              _type:"location-list"
-            }}, detail);
+          // client.index({
+          //   index: 'place-suggestions',
+          //   type: 'location-list',
+          //   body: detail,
+          // }, function(err, response, status) {
+          //   if (err) console.log(err, 'error')
+          //   else console.log(response, 'Index ');
+          // });
           place_prediction.push(detail);
         }
-        client.bulk({
-          body: dataBulk
-        }, function (err) {
-          if (err) next(err);
-        })
-        res.status(200).json(place_prediction);
-      } else {
-        hits.hits.hits.forEach((hit) => {
-          place_prediction.push(hit._source);
-        });
         res.status(200).json(place_prediction);
       }
     } catch (err) {

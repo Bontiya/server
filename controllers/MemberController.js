@@ -1,12 +1,5 @@
 const Member = require("../models/Member");
 const Event = require("../models/Event");
-const admin = require('firebase-admin')
-
-admin.initializeApp({
-  credential: admin.credential.cert(require('../adminKeyfile.json')),
-  databaseURL: 'https://pushnotification-f4b04.firebaseio.com'
-});
-
 
 class MemberController {
   static create(req, res, next) {
@@ -44,22 +37,9 @@ class MemberController {
       })
       .then(event => {
         const io = req.app.get("socketio");
-        const membersFirebaseToken = req.body[0].membersFirebaseToken
-        console.log(req.body[0],'INI REQ BODY')
         if (process.env.NODE_ENV !== "test" && io) {
           MemberController.notifToStatusInvitedPending(req.body, event, io);
         }
-        admin.messaging().sendMulticast({
-          tokens: ['eB6sZJKFtNU:APA91bH6BU7hfXp2HXwmZfoBuC9VrT9vu4QcahSSn1vAXw-Q6KbVCL5K1WvRjeP_6x0yhI3iU0StNucJRmZNvTzDH8BTd3kgqfdVmV4T1Zz4emr-9ByiTpzqK73jmSuGHgxnCQiOG3ZP'],
-          notification: {
-            body: 'Ada member baru',
-            title: 'Invite',
-          }
-        })
-          .then( response => {
-            console.log( response.successCount + ' messages were sent')
-          })
-          .catch( err => console.log( err ))
         res.status(201).json(event);
       })
       .catch(next);
@@ -87,7 +67,6 @@ class MemberController {
         });
       })
       .catch(err => {
-        console.log(err);
         next(err);
       });
   }
@@ -148,7 +127,6 @@ class MemberController {
   }
 
   static getStatusInvitedPending(req, res, next) {
-    // console.log(req.userId, '============')
     Member.find({
       user: req.userId,
       statusInvited: "pending"
@@ -171,7 +149,6 @@ class MemberController {
   }
 
   static notifStatusInvitedUpdated(notifFrom, eventData, members, io) {
-    console.log(`${members[0].user} socketio StatusInvitedUpdated`);
     if (notifFrom.statusInvited === "received") {
       io.emit(`${notifFrom.userId} myAcceptedEvent`, "success accepted event");
     }
@@ -184,7 +161,6 @@ class MemberController {
   }
 
   static notifToStatusInvitedPending(members, event, io) {
-    console.log("socketio StatusInvitedPending");
     members.forEach(data => {
       io.emit(`${data.userId} StatusInvitedPending`, event);
     });
@@ -207,7 +183,6 @@ class MemberController {
   }
 
   static updateStatusKey(req, res, next) {
-    console.log('update status key benar')
     Member.update({
       _id: req.params.memberId
     }, {
@@ -217,6 +192,18 @@ class MemberController {
         res.status(200).json(data)
       })
       .catch(next)
+  }
+  static async updateMemberLocation(req, res, next) {
+    try {
+      const { lat, lon } = req.body;
+      const response = Member.updateMany(
+        { user: req.params.userId },
+        { $set: { 'location.lat': Number(lat), 'location.lon': Number(lon) } },
+      );
+      res.status(200).json(response);
+    } catch (err) {
+      next(err);
+    }
   }
 }
 

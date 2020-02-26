@@ -26,7 +26,8 @@ module.exports = function (req, res, next) {
             });
             next()
         })
-        .catch(() => {
+        .catch((err) => {
+            console.log(err)
             res.status(500).json({
                 errors: ['internal server error']
             })
