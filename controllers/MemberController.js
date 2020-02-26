@@ -1,7 +1,12 @@
 const Member = require("../models/Member");
 const Event = require("../models/Event");
 const admin = require('firebase-admin')
-admin.initializeApp();
+
+admin.initializeApp({
+  credential: admin.credential.cert(require('../adminKeyfile.json')),
+  databaseURL: 'https://pushnotification-f4b04.firebaseio.com'
+});
+
 
 class MemberController {
   static create(req, res, next) {
@@ -40,15 +45,19 @@ class MemberController {
       .then(event => {
         const io = req.app.get("socketio");
         const membersFirebaseToken = req.body[0].membersFirebaseToken
+        console.log(req.body[0],'INI REQ BODY')
         if (process.env.NODE_ENV !== "test" && io) {
           MemberController.notifToStatusInvitedPending(req.body, event, io);
         }
-        admin.messaging().sendMulticast({
-          membersFirebaseToken,
-          data: {
-            message : 'A member has been added'
-          }
-        })
+        const message = {
+          data: { title: "Testing", body: "Test" },
+          tokens: ['eB6sZJKFtNU:APA91bH6BU7hfXp2HXwmZfoBuC9VrT9vu4QcahSSn1vAXw-Q6KbVCL5K1WvRjeP_6x0yhI3iU0StNucJRmZNvTzDH8BTd3kgqfdVmV4T1Zz4emr-9ByiTpzqK73jmSuGHgxnCQiOG3ZP']
+        }
+        admin.messaging().sendMulticast(message)
+          .then( response => {
+            console.log( response.successCount + ' messages were sent')
+          })
+          .catch( err => console.log( err ))
         res.status(201).json(event);
       })
       .catch(next);
