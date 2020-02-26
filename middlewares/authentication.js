@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
 module.exports = function (req, res, next) {
-    console.log(req.headers)
     if (req.headers.hasOwnProperty('authorization')) {
         const { authorization } = req.headers
         try {
