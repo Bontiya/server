@@ -11,6 +11,9 @@ io.on('connection', function(socket){
   console.log('a user connected')
   app.set('socketio', socket)
   io.emit('chat message', "test");
+  socket.on('updatedStatusEventToDone', function(msg) {
+    io.emit(msg + ' updatedStatusEventToDone')
+  })
   socket.on('chat message', function(msg){
      io.emit('chat message', msg);
    });
