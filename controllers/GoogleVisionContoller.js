@@ -5,7 +5,9 @@ const client = new ImageAnnotatorClient({
 });
 
 class GoogleVisionController {
+  /* istanbul ignore next */
   static async detectAnImage(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { data } = req.body
       const response = await client.labelDetection(Buffer.from(data.baseImg, 'base64'));

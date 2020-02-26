@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const { checkPassword } = require('../helpers/bcrypt');
 module.exports = function (req, res, next) {  
+    /* istanbul ignore next */
     User
         .findOne({
             _id: req.userId

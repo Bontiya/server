@@ -1,5 +1,5 @@
 module.exports = function(err, req, res, next) {
-  // console.log(err)
+  /* istanbul ignore next */
   let status = 500;
   let msg = ["internal server error"];
 

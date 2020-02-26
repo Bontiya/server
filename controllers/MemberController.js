@@ -2,14 +2,15 @@ const Member = require("../models/Member");
 const Event = require("../models/Event");
 
 class MemberController {
+  /* istanbul ignore next */
   static create(req, res, next) {
-    
+    /* istanbul ignore next */
     const { eventId } = req.params;
     const promiseMembers = MemberController.createPromiseInsertMembers(
       req.body,
       eventId
     );
-
+    /* istanbul ignore next */
     Promise.all(promiseMembers)
       .then(members => {
         // res.status(201).json(members)
@@ -27,6 +28,7 @@ class MemberController {
         );
       })
       .then((e) => {
+        /* istanbul ignore next */
         return Event.findOne({ _id: eventId }).populate({
           path: "members",
           populate: {
@@ -46,6 +48,7 @@ class MemberController {
   }
 
   static delete(req, res, next) {
+    /* istanbul ignore next */
     const { memberId, eventId } = req.params;
     Member.deleteOne({ _id: memberId })
       .then(() => {
@@ -72,6 +75,7 @@ class MemberController {
   }
 
   static updateStatusInvited(req, res, next) {
+    /* istanbul ignore next */
     const { memberId } = req.params;
     const { statusInvited, location } = req.body;
     Member.updateOne(
@@ -127,6 +131,7 @@ class MemberController {
   }
 
   static getStatusInvitedPending(req, res, next) {
+    /* istanbul ignore next */
     Member.find({
       user: req.userId,
       statusInvited: "pending"
@@ -149,6 +154,7 @@ class MemberController {
   }
 
   static notifStatusInvitedUpdated(notifFrom, eventData, members, io) {
+    /* istanbul ignore next */
     if (notifFrom.statusInvited === "received") {
       io.emit(`${notifFrom.userId} myAcceptedEvent`, "success accepted event");
     }
@@ -161,12 +167,14 @@ class MemberController {
   }
 
   static notifToStatusInvitedPending(members, event, io) {
+    /* istanbul ignore next */
     members.forEach(data => {
       io.emit(`${data.userId} StatusInvitedPending`, event);
     });
   }
 
   static createPromiseInsertMembers(member, eventId) {
+    /* istanbul ignore next */
     const promiseMembers = [];
     member.forEach(data => {
       promiseMembers.push(
@@ -183,6 +191,7 @@ class MemberController {
   }
 
   static updateStatusKey(req, res, next) {
+    /* istanbul ignore next */
     Member.update({
       _id: req.params.memberId
     }, {
@@ -194,6 +203,7 @@ class MemberController {
       .catch(next)
   }
   static async updateMemberLocation(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { lat, lon } = req.body;
       const response = Member.updateMany(

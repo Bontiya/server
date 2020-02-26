@@ -1,6 +1,7 @@
 const Member = require('../models/Member');
 
 module.exports = (req, res, next) => {
+    /* istanbul ignore next */
     Member
         .findById(req.params.memberId)
         .then(member => {

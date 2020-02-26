@@ -1,6 +1,7 @@
 const Event = require('../models/Event');
 
 module.exports = function (req, res, next) {
+    /* istanbul ignore next */
     Event
         .findById(req.params.eventId)
         .then(event => {
@@ -13,6 +14,7 @@ module.exports = function (req, res, next) {
             }
         })
         .catch((err) => {
+            /* istanbul ignore next */
             if (err.name === 'CastError') {
                 res.status(422).json({
                     errors: ['event id not found']

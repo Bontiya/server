@@ -1,6 +1,6 @@
 const Event = require('../models/Event');
 module.exports = function (req, res, next) {
-    console.log('masuk mid')
+    /* istanbul ignore next */
     Event
         .findOne({
             _id: req.params.eventId

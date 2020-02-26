@@ -13,7 +13,9 @@ const polyline = require('@mapbox/polyline');
 
 
 class LocationContrller {
+  /* istanbul ignore next */
   static async routes(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { origin, destination } = req.query;
       const { data } = await axios({
@@ -42,6 +44,7 @@ class LocationContrller {
   }
   
   static async reverseGeoLocation(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { lat, lon } = req.query;
       if (!lat || !lon) {
@@ -78,6 +81,7 @@ class LocationContrller {
     }
   }
   static async queryLocation(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { q } = req.query;
       if (!q) {
@@ -171,6 +175,7 @@ class LocationContrller {
   }
 
   static async backupQuery(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { q } = req.query;
       if (!q) {
@@ -197,6 +202,7 @@ class LocationContrller {
     }
   }
   static async  getLocationDetail(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { placeid } = req.query;
       if (!placeid) {
@@ -228,6 +234,7 @@ class LocationContrller {
     }
   }
   static async getTravelDuration(req, res, next) {
+    /* istanbul ignore next */
     try {
       const { origins, destination } = req.query
       /** mode
