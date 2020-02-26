@@ -195,7 +195,7 @@ class MemberController {
   }
   static async updateMemberLocation(req, res, next) {
     try {
-      const { lat, lon } = req.body;
+      const { lat, lon } = req.query;
       const response = Member.updateMany(
         { user: req.userId },
         { $set: { 'location.lat': Number(lat), 'location.lon': Number(lon) } },
