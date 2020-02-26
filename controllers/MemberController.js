@@ -69,9 +69,7 @@ class MemberController {
           ok: "ok"
         });
       })
-      .catch(err => {
-        next(err);
-      });
+      .catch(next);
   }
 
   static updateStatusInvited(req, res, next) {
@@ -101,6 +99,7 @@ class MemberController {
       })
       .then(member => {
         const io = req.app.get("socketio");
+        /* istanbul ignore next */ 
         if (process.env.NODE_ENV !== "test" && io) {
           const notifFrom = {
             memberId: member._id,
@@ -108,7 +107,7 @@ class MemberController {
             name: member.user.name,
             role: member.role,
             statusKey: member.statusKey,
-            statusInvited: member.statusInvited
+            statusInvited: member.statusInvited 
           };
           const eventData = {
             location: member.event.location,
@@ -158,6 +157,7 @@ class MemberController {
     if (notifFrom.statusInvited === "received") {
       io.emit(`${notifFrom.userId} myAcceptedEvent`, "success accepted event");
     }
+    /* istanbul ignore next */ 
     members.forEach(data => {
       io.emit(`${data.user} StatusInvitedMemberUpdated`, {
         notifFrom,
@@ -176,6 +176,7 @@ class MemberController {
   static createPromiseInsertMembers(member, eventId) {
     /* istanbul ignore next */
     const promiseMembers = [];
+    /* istanbul ignore next */ 
     member.forEach(data => {
       promiseMembers.push(
         Member.create({

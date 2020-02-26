@@ -74,6 +74,7 @@ class EventController {
   static async getEvents(req, res, next) {
     /* istanbul ignore next */
     let options = {};
+    /* istanbul ignore next */ 
     if (req.query.status) {
       options.status = req.query.status;
     }
@@ -89,11 +90,14 @@ class EventController {
         match: options
       });
       let events = [];
+      /* istanbul ignore next */ 
       members.forEach(member => {
         if (member.event) events.push(member.event);
       });
       res.status(200).json(events);
+      /* istanbul ignore next */ 
     } catch (error) {
+      /* istanbul ignore next */ 
       next(error);
     }
   }

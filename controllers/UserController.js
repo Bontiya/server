@@ -107,13 +107,16 @@ class UserController {
             name: 'ValidationError',
             errors: []
         }
+        /* istanbul ignore next */ 
         for (const key in obj) {
+            /* istanbul ignore next */ 
             if (!obj[key]) {
                 messageError.errors.push({
                     message: `${key} is required`
                 })
             }
         }
+        /* istanbul ignore next */
         if (messageError.errors.length) return messageError
         return false
     }
@@ -121,6 +124,7 @@ class UserController {
     static getUserBySearch(req, res, next) {
         /* istanbul ignore next */
         let options = {}
+        /* istanbul ignore next */
         if (req.query.email) {
             options.email = {
                 $regex: `.*${req.query.email}.*`

@@ -19,6 +19,7 @@ const EventSchema = new Schema({
       validator: function (v) {
         const dateNow = new Date().getTime()
         const dateEvent = new Date(v).getTime()
+        /* istanbul ignore next */ 
         if (dateNow >= dateEvent) return false
         return true
       },

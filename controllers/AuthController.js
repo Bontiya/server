@@ -44,8 +44,10 @@ class AuthController {
                         message: 'email/password incorrect'
                     }]
                 }
+                /* istanbul ignore next */
                 if (user) {
                     const passwordIsValid = checkPassword(password, user.password)
+                    /* istanbul ignore next */
                     if (passwordIsValid) {
                         const token = jwt.sign({
                             userId: user._id,

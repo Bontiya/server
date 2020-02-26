@@ -8,7 +8,7 @@ const location = require('./location');
 const event = require('./event');
 const vision = require('./google_vision');
 
-// ini biarin yaa
+/* istanbul ignore next */ 
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
