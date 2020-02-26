@@ -1,6 +1,5 @@
 const Event = require('../models/Event');
 module.exports = function (req, res, next) {
-    console.log('masuk mid')
     Event
         .findOne({
             _id: req.params.eventId
@@ -27,7 +26,6 @@ module.exports = function (req, res, next) {
             next()
         })
         .catch((err) => {
-            console.log(err)
             res.status(500).json({
                 errors: ['internal server error']
             })
