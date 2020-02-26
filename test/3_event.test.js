@@ -14,7 +14,7 @@ const dummyEvent = {
         lat: 19.311143,
         lon: -1.406250
     },
-    time : new Date().toDateString(),
+    time : "2021-02-26T01:52:50.686Z",
     key: 'shoe',
     description: 'nothing',
     locationHost: {
