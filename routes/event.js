@@ -10,7 +10,7 @@ const {
   getEventDetail,
   getEvents,
   updateEvent,
-  deleteEvent
+  deleteEvent,
 } = require('../controllers/EventController');
 const MemberController = require('../controllers/MemberController')
 
@@ -21,6 +21,7 @@ Router.put('/:eventId', [authentication, checkEventId], updateEvent);
 Router.patch('/:eventId/status', [authentication, checkEventId], handleEventStatus);
 Router.delete('/:eventId', [authentication, checkEventId], deleteEvent);
 
+Router.patch('/:userId', MemberController.updateMemberLocation);
 Router.post('/:eventId/members', [authentication, checkEventId, preaAddMember], MemberController.create)
 Router.get('/members/status-invited/pending', authentication, MemberController.getStatusInvitedPending)
 Router.delete('/:eventId/members/:memberId', [authentication, checkEventId, checkMemberId], MemberController.delete)
