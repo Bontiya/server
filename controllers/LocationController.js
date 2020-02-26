@@ -100,7 +100,7 @@ class LocationContrller {
         })
       const place_prediction = [];
       const dataBulk = [];
-      if (!hits.hits.max_score) {
+      if (hits.hits.max_score < 7) {
         const { data }  = await axios({
           method: 'GET',
           url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
@@ -130,6 +130,33 @@ class LocationContrller {
         });
         res.status(200).json(place_prediction);
       }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async backupQuery(req, res, next) {
+    try {
+      const { q } = req.query;
+      if (!q) {
+        res.status(400).json({ errors: ['query q is required as location name'] });
+        return;
+      };
+      const place_prediction = [];
+      const dataBulk = [];
+      const { data }  = await axios({
+        method: 'GET',
+        url: `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${q}&types=establishment&key=${process.env.GOOGLE_MAP_KEY}&limit=10&location=0.7893,113.9213`
+      });
+      for (let i = 0; i < data.predictions.length; i++) {
+        const detail = {
+          id: data.predictions[i].place_id,
+          name: data.predictions[i].structured_formatting.main_text,
+          description: data.predictions[i].description
+        };
+        place_prediction.push(detail);
+      }
+      res.status(200).json(place_prediction);
     } catch (err) {
       next(err);
     }
@@ -179,16 +206,20 @@ class LocationContrller {
         method: 'GET',
         url: `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${origins}&destinations=${destination}&key=${process.env.GOOGLE_MAP_KEY}&mode=${mode}`
       })
-      const distanceDetail = {
-        originAddress: data.origin_addresses,
-        destinationAddress: data.destination_addresses,
-        distance: data.rows[0].elements[0].distance.text,
-        duration: {
-          seconds: data.rows[0].elements[0].duration.value,
-          durationText: data.rows[0].elements[0].duration,
-        },
-      };
-      res.status(200).json(distanceDetail)
+      if (data.rows[0].elements[0].status === 'ZERO_RESULTS') {
+        res.status(400).json({ errros: ['Location not found!'] })
+      } else {
+        const distanceDetail = {
+          originAddress: data.origin_addresses,
+          destinationAddress: data.destination_addresses,
+          distance: data.rows[0].elements[0].distance.text,
+          duration: {
+            seconds: data.rows[0].elements[0].duration.value,
+            durationText: data.rows[0].elements[0].duration,
+          },
+        };
+        res.status(200).json(distanceDetail)
+      }
     } catch (err) {
       next(err);
     }

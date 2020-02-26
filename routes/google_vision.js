@@ -4,6 +4,6 @@ const {
   detectAnImage,
 } = require('../controllers/GoogleVisionContoller');
 
-Router.get('/detect', detectAnImage);
+Router.post('/detect', detectAnImage);
 
 module.exports = Router;

@@ -49,11 +49,13 @@ class MemberController {
         if (process.env.NODE_ENV !== "test" && io) {
           MemberController.notifToStatusInvitedPending(req.body, event, io);
         }
-        const message = {
-          data: { title: "Testing", body: "Test" },
-          tokens: ['eB6sZJKFtNU:APA91bH6BU7hfXp2HXwmZfoBuC9VrT9vu4QcahSSn1vAXw-Q6KbVCL5K1WvRjeP_6x0yhI3iU0StNucJRmZNvTzDH8BTd3kgqfdVmV4T1Zz4emr-9ByiTpzqK73jmSuGHgxnCQiOG3ZP']
-        }
-        admin.messaging().sendMulticast(message)
+        admin.messaging().sendMulticast({
+          tokens: ['eB6sZJKFtNU:APA91bH6BU7hfXp2HXwmZfoBuC9VrT9vu4QcahSSn1vAXw-Q6KbVCL5K1WvRjeP_6x0yhI3iU0StNucJRmZNvTzDH8BTd3kgqfdVmV4T1Zz4emr-9ByiTpzqK73jmSuGHgxnCQiOG3ZP'],
+          notification: {
+            body: 'Ada member baru',
+            title: 'Invite',
+          }
+        })
           .then( response => {
             console.log( response.successCount + ' messages were sent')
           })
