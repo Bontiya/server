@@ -76,7 +76,6 @@ class MemberController {
         });
       })
       .catch(err => {
-        console.log(err);
         next(err);
       });
   }
@@ -137,7 +136,6 @@ class MemberController {
   }
 
   static getStatusInvitedPending(req, res, next) {
-    // console.log(req.userId, '============')
     Member.find({
       user: req.userId,
       statusInvited: "pending"
@@ -160,7 +158,6 @@ class MemberController {
   }
 
   static notifStatusInvitedUpdated(notifFrom, eventData, members, io) {
-    console.log(`${members[0].user} socketio StatusInvitedUpdated`);
     if (notifFrom.statusInvited === "received") {
       io.emit(`${notifFrom.userId} myAcceptedEvent`, "success accepted event");
     }
@@ -173,7 +170,6 @@ class MemberController {
   }
 
   static notifToStatusInvitedPending(members, event, io) {
-    console.log("socketio StatusInvitedPending");
     members.forEach(data => {
       io.emit(`${data.userId} StatusInvitedPending`, event);
     });
@@ -196,7 +192,6 @@ class MemberController {
   }
 
   static updateStatusKey(req, res, next) {
-    console.log('update status key benar')
     Member.update({
       _id: req.params.memberId
     }, {
@@ -206,6 +201,18 @@ class MemberController {
         res.status(200).json(data)
       })
       .catch(next)
+  }
+  static async updateMemberLocation(req, res, next) {
+    try {
+      const { lat, lon } = req.body;
+      const response = Member.updateMany(
+        { user: req.params.userId },
+        { $set: { 'location.lat': lat, 'location.lon': lon } },
+      );
+      res.status(200).json(response);
+    } catch (err) {
+      next(err);
+    }
   }
 }
 
