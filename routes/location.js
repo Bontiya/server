@@ -9,7 +9,7 @@ const {
   backupQuery
 } = require('../controllers/LocationController');
 
-Router.get('/search', backupQuery);
+Router.get('/search', queryLocation);
 Router.get('/detail', getLocationDetail);
 Router.get('/reverse', reverseGeoLocation);
 Router.get('/duration', getTravelDuration);
